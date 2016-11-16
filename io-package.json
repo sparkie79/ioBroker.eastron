@@ -16,8 +16,7 @@
 				 "ru": "ioBroker Eastron драйвер как образец"
 		},
         "platform":                 "Javascript/Node.js",
-        "mode":                     "schedule",
-        "schedule":                 "1 * * * *",
+        "mode":                     "daemon",
         "icon":                     "eastron.png",
         "enabled":                  true,
 		"extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.eastron/master/admin/eastron.png",

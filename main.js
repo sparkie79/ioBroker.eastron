@@ -34,6 +34,7 @@
 var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
 var eastron = require('modbus-eastron');
 var adapter = utils.adapter('eastron');
+var running = true;
 
 // is called when adapter shuts down - callback has to be called under any circumstances!
 adapter.on('unload', function (callback) {
@@ -80,6 +81,10 @@ adapter.on('message', function (obj) {
 adapter.on('ready', function () {
     main();
     read();
+});
+
+adapter.on('unload', function () {
+    running = false;
 });
 
 function main() {
@@ -145,7 +150,9 @@ function main() {
 }
 
 function read () {
-    eastron
-        .default({ baud: 2400, id: 1, dev: "/dev/485_pwr", model: 'SDM120CT', direction: 'production' })
-        .then(res => { adapter.setState('power', res.power)});
+    while(running) {
+        eastron
+            .default({baud: 2400, id: 1, dev: "/dev/485_pwr", model: 'SDM120CT', direction: 'production'})
+            .then(res = > {adapter.setState('power', {val: res.power, ack: true})})
+    }
 }
