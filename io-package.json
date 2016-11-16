@@ -1,0 +1,37 @@
+{
+    "common": {
+        "name":                     "eastron",
+        "version": "0.0.1",
+	    "news": {
+			"0.0.1": {
+			  "en": "initial adapter",
+			  "de": "Initiale Version",
+			  "ru": "Первоначальный адаптер"
+			}
+		},
+        "title":                    "Javascript/Node.js based eastron adapter",
+        "desc":                     {
+				 "en": "ioBroker eastron Adapter",
+				 "de": "ioBroker Eastron Adapter",
+				 "ru": "ioBroker Eastron драйвер как образец"
+		},
+        "platform":                 "Javascript/Node.js",
+        "mode":                     "schedule",
+        "schedule":                 "1 * * * *",
+        "icon":                     "eastron.png",
+        "enabled":                  true,
+		"extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.eastron/master/admin/eastron.png",
+		"keywords":                 ["eastron", "vis", "GUI", "graphical", "scada"],
+        "readme":                   "https://github.com/ioBroker/ioBroker.eastron/blob/master/README.md",
+		"loglevel":                 "info",
+        "type":                     "common adapters",
+        "restartAdapters":          ["vis"]
+    },
+    "native": {
+        "test1": true,
+        "test2": 42
+    },
+    "objects": [
+
+    ]
+}
