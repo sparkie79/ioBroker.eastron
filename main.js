@@ -32,9 +32,21 @@
 "use strict";
 
 var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
-var eastron = require('modbus-eastron');
 var adapter = utils.adapter('eastron');
-var running = true;
+var ModbusRTU = require("modbus-serial");
+var client = new ModbusRTU();
+var nextPoll;
+
+process.on('SIGINT', function () {
+    if (adapter && adapter.setState) {
+        adapter.setState("info.connection", false, true);
+        adapter.setState("info.pdu",        "",    true);
+        adapter.setState("info.poll_time",  "",    true);
+    }
+    if (nextPoll)  {
+        clearTimeout(nextPoll);
+    }
+});
 
 // is called when adapter shuts down - callback has to be called under any circumstances!
 adapter.on('unload', function (callback) {
@@ -79,31 +91,18 @@ adapter.on('message', function (obj) {
 // is called when databases are connected and adapter received configuration.
 // start here!
 adapter.on('ready', function () {
-    main();
-    read();
+    client.setID(adapter.config.id);
+    client.setTimeout(5000);
+    client.connectRTU(adapter.config.port, {baudrate: parseInt(adapter.config.baud)}, poll);
 });
 
 adapter.on('unload', function () {
-    running = false;
+
 });
 
 function main() {
-
-    // The adapters config (in the instance object everything under the attribute "native") is accessible via
-    // adapter.config:
     adapter.log.info('config test1: ' + adapter.config.test1);
     adapter.log.info('config test1: ' + adapter.config.test2);
-
-
-    /**
-     *
-     *      For every state in the system there has to be also an object of type state
-     *
-     *      Here a simple eastron for a boolean variable named "testVariable"
-     *
-     *      Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
-     *
-     */
 
     adapter.setObject('testVariable', {
         type: 'state',
@@ -114,45 +113,21 @@ function main() {
         },
         native: {}
     });
-
-    // in this eastron all states changes inside the adapters namespace are subscribed
     adapter.subscribeStates('*');
-
-
-    /**
-     *   setState examples
-     *
-     *   you will notice that each setState will cause the stateChange event to fire (because of above subscribeStates cmd)
-     *
-     */
-
-    // the variable testVariable is set to true as command (ack=false)
     adapter.setState('testVariable', true);
-
-    // same thing, but the value is flagged "ack"
-    // ack should be always set to true if the value is received from or acknowledged from the target system
     adapter.setState('testVariable', {val: true, ack: true});
-
-    // same thing, but the state is deleted after 30s (getState will return null afterwards)
     adapter.setState('testVariable', {val: true, ack: true, expire: 30});
-
-
-
-    // examples for the checkPassword/checkGroup functions
-    adapter.checkPassword('admin', 'iobroker', function (res) {
-        console.log('check user admin pw ioboker: ' + res);
-    });
-
-    adapter.checkGroup('admin', 'admin', function (res) {
-        console.log('check group user admin group admin: ' + res);
-    });
-
 }
 
-function read () {
-    while(running) {
-        eastron
-            .default({baud: 2400, id: 1, dev: "/dev/485_pwr", model: 'SDM120CT', direction: 'production'})
-            .then(res = > {adapter.setState('power', {val: res.power, ack: true})})
-    }
+function poll () {
+    client.readInputRegisters(0, 2).then(data => {
+        var value = data.buffer.readFloatBE().toFixed(1)
+        console.log();
+        adapter.setState('voltage', {val: value, ack: true});
+    }, err =>
+        console.log(err)
+    ).then(
+        nextPoll = setTimeout(poll, 2000)
+    );
+    //nextPoll = setTimeout(poll, 20);
 }

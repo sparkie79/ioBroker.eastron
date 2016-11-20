@@ -9,7 +9,7 @@
 			  "ru": "Первоначальный адаптер"
 			}
 		},
-        "title":                    "Javascript/Node.js based eastron adapter",
+        "title":                    "Eastron energy meter adapter",
         "desc":                     {
 				 "en": "ioBroker eastron Adapter",
 				 "de": "ioBroker Eastron Adapter",
@@ -20,15 +20,15 @@
         "icon":                     "eastron.png",
         "enabled":                  true,
 		"extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.eastron/master/admin/eastron.png",
-		"keywords":                 ["eastron", "vis", "GUI", "graphical", "scada"],
+		"keywords":                 ["eastron", "energy", "meter"],
         "readme":                   "https://github.com/ioBroker/ioBroker.eastron/blob/master/README.md",
 		"loglevel":                 "info",
-        "type":                     "common adapters",
-        "restartAdapters":          ["vis"]
+        "type":                     "common adapters"
     },
     "native": {
-        "test1": true,
-        "test2": 42
+        "port": "/dev/ttyusb0",
+        "id": 1,
+        "baud": 2400
     },
     "objects": [
 
