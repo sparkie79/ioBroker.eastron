@@ -93,8 +93,18 @@ adapter.on('message', function (obj) {
 adapter.on('ready', function () {
     client.setID(adapter.config.id);
     client.setTimeout(5000);
-    client.connectRTU(adapter.config.port, {baudrate: parseInt(adapter.config.baud)}, poll);
+    adapter.log.info("Connecting to " + adapter.config.port)
+    client.connectRTUBuffered(adapter.config.port, {baudrate: parseInt(adapter.config.baud)}, openResult);
 });
+
+function openResult(error) {
+  if(error) {
+    adapter.log.error(error);
+  } else {
+    adapter.log.info("Port opened, starting polling...");
+    poll();
+  }
+}
 
 adapter.on('unload', function () {
 
@@ -120,9 +130,9 @@ function main() {
 }
 
 function poll () {
+    adapter.log.debug("Polling")
     client.readInputRegisters(0, 2).then(data => {
-        var value = data.buffer.readFloatBE().toFixed(1)
-        console.log();
+        var value = data.buffer.readFloatBE().toFixed(1);
         adapter.setState('voltage', {val: value, ack: true});
     }, err =>
         console.log(err)
