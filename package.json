@@ -26,7 +26,8 @@
   },
   "dependencies": {
     "async": "^2.1.2",
-    "modbus-serial": "^4.5.1"
+    "modbus-serial": "^4.5.1",
+    "serialport": "^4.0.6"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
