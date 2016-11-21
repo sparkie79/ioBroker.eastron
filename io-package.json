@@ -30,7 +30,8 @@
         "port": "/dev/ttyusb0",
         "id": 1,
         "baud": 2400,
-	"model": "SDM120CT"
+	"model": "SDM120CT",
+        "positive": false
     },
     "objects": [
 

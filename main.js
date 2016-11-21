@@ -128,6 +128,9 @@ function poll () {
         setConnected(true);
         adapter.log.debug("Response received");
         var value = result.buffer.readFloatBE().toFixed(1);
+        if(adapter.config.positive)
+          value = Math.abs(value);
+
         adapter.setState(register.label, {val: value, ack: true});
         cb();
       }).catch(error => cb(error))
