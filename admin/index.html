@@ -26,6 +26,28 @@
 
 <!-- you have to define 2 functions in the global scope: -->
 <script type="text/javascript">
+    function getDevices(actualValue) {
+        timeout = setTimeout(function () {
+            getDevices(actualValue);
+        }, 2000);
+        sendTo(null, 'listModels', null, function (list) {
+            if (timeout) {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+            if (!list || !list.length) {
+                setTimeout(function () {
+                    getDevices(actualValue);
+                }, 1000);
+                return;
+            }
+            var text = '<option value="">' + _('Select Device') + '</option>';
+            for (var j = 0; j < list.length; j++) {
+              text += '<option value="' + list[j] + '" ' + ((actualValue === list[j]) ? 'selected' : '') + '>' + list[j] + '</option>';
+            }
+            $('#model').html(text);
+        });
+    }
 
     // Dictionary (systemDictionary is global variable from adapter-settings.js)
     systemDictionary = {
@@ -55,6 +77,7 @@
 				});
             }
         }
+        getDevices(settings.model);
         // Signal to admin, that no changes yet
         onChange(false);
     }
@@ -79,11 +102,12 @@
         <td><img src="eastron.png"/></td>
         <td><h3 class="translate">eastron adapter settings</h3></td>
     </tr></table>
-    <p>
-        <span class="translate">device</span> <input class="value" id="port"/><br>
-        <span class="translate">id</span> <input class="value" id="id"/><br>
-        <span class="translate">baudrate</span> <input class="value" id="baud"/><br>
-    </p>
+    <table>
+        <tr><td class="translate">Device model:</td><td><select class="value" id="model"</td></tr>
+        <tr><td class="translate">Port:</td><td><input  class="value" id="port"/></td></tr>
+        <tr><td class="translate">Id:</td><td><input  class="value number" id="id" size="3" maxlength="3"/></td></tr>
+        <tr><td class="translate">Baudrate:</td><td><input class="value number" id="baud"/></td></tr>
+    </table>
 
     <p class="translate">on save adapter restarts with new config immediately</p>
 

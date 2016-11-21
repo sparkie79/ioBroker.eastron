@@ -1,0 +1,143 @@
+   {
+        "SDM120CT": [
+            {
+                "label": "voltage",
+                "um:": "V",
+                "reg": 0
+            },
+            {
+                "label": "current",
+                "um": "A",
+                "reg": 6
+            },
+            {
+                "label": "power.active",
+                "um": "W",
+                "reg": 12
+            },
+            {
+                "label": "power.apparent",
+                "um": "VA",
+                "reg": 20
+            },
+            {
+                "label": "power.reactive",
+                "um": "VAr",
+                "reg": 24
+            },
+            {
+                "label": "power.factor",
+                "reg": 30
+            },
+            {
+                "label": "phaseAngle",
+                "reg": 36
+            },
+            {
+                "label": "frequency",
+                "um": "Hz",
+                "reg": 70
+            },
+            {
+                "label": "import.power.active",
+                "um": "KWh",
+                "reg": 72
+            },
+            {
+                "label": "export.power.active",
+                "um": "KWh",
+                "reg": 74
+            },
+            {
+                "label": "total.power.active",
+                "um": "KWh",
+                "reg": 342
+            },
+            {
+                "label": "import.power.reactive",
+                "um": "KVarh",
+                "reg": 76
+            },
+            {
+                "label": "export.power.reactive",
+                "um": "KVarh",
+                "reg": 78
+            },
+            {
+                "label": "total.power.reactive",
+                "um": "KVarh",
+                "reg": 344
+            }
+        ]
+    ,
+        "SDM220": [
+            {
+                "label": "voltage",
+                "reg": 0,
+                "um": "V"
+            },
+            {
+                "label": "current",
+                "reg": 6,
+                "um": "A"
+            },
+            {
+                "label": "power.apparent",
+                "reg": 12,
+                "um": "VA"
+            },
+            {
+                "label": "power.active",
+                "reg": 20,
+                "um": "W"
+            },
+            {
+                "label": "power.reactive",
+                "reg": 24, 
+                "um": "VAR"
+            },
+            {
+                "label": "power.factor",
+                "reg": 30
+            },
+            {
+                "label": "phaseAngle",
+                "reg": 36
+            },
+            {
+                "label": "frequency",
+                "reg": 70,
+                "um": "Hz"
+            },
+            {
+                "label": "import.power.active",
+                "reg": 72,
+                "um": "KWh"
+            },
+            {
+                "label": "export.power.active",
+                "reg": 74,
+                "um": "KWh"
+            },
+            {
+                "label": "total.power.active",
+                "reg": 342,
+                "um": "KWh"
+            },
+            {
+                "label": "import.power.reactive",
+                "reg": 76,
+                "um": "KVar"
+            },
+            {
+                "label": "export.power.reactive",
+                "reg": 78,
+                "um": "KVar"
+            },
+            {
+                "label": "total.power.reactive",
+                "reg": 344,
+                "um": "Kvar"
+            }
+        ]
+    }

@@ -17,6 +17,7 @@
 		},
         "platform":                 "Javascript/Node.js",
         "mode":                     "daemon",
+        "messagebox":		    "true",
         "icon":                     "eastron.png",
         "enabled":                  true,
 		"extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.eastron/master/admin/eastron.png",
@@ -28,7 +29,8 @@
     "native": {
         "port": "/dev/ttyusb0",
         "id": 1,
-        "baud": 2400
+        "baud": 2400,
+	"model": "SDM120CT"
     },
     "objects": [
 

@@ -31,10 +31,13 @@
 /*jslint node: true */
 "use strict";
 
+var async = require("async")
 var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
 var adapter = utils.adapter('eastron');
 var ModbusRTU = require("modbus-serial");
 var client = new ModbusRTU();
+var Models = require('./models.json');
+var model;
 var nextPoll;
 
 process.on('SIGINT', function () {
@@ -75,22 +78,22 @@ adapter.on('stateChange', function (id, state) {
     }
 });
 
-// Some message was sent to adapter instance over message box. Used by email, pushover, text2speech, ...
 adapter.on('message', function (obj) {
-    if (typeof obj == 'object' && obj.message) {
-        if (obj.command == 'send') {
-            // e.g. send email or pushover or whatever
-            console.log('send command');
-
-            // Send response in callback if required
-            if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
-        }
+    if (obj && obj.command == 'listModels') {
+            var models = Object.keys(Models)
+            adapter.log.info("Listing models");
+            if (obj.callback) adapter.sendTo(obj.from, obj.command, models, obj.callback);
     }
 });
 
 // is called when databases are connected and adapter received configuration.
 // start here!
 adapter.on('ready', function () {
+    if(!adapter.config.model) {
+      adapter.log.error("Select a device Model");
+      return;
+    }
+    model = Models[adapter.config.model];
     client.setID(adapter.config.id);
     client.setTimeout(5000);
     adapter.log.info("Connecting to " + adapter.config.port)
@@ -129,15 +132,41 @@ function main() {
     adapter.setState('testVariable', {val: true, ack: true, expire: 30});
 }
 
+function publish(register, value) {
+  var id = "";
+  if(register.group)
+   id = register.group + "."
+  id += register.label;
+
+var obj = {
+            _id: id,
+                type: 'state',
+                common: {
+                    name: id,
+                    unit: register.um,
+                    type: 'number',
+                    role: 'variable'
+                },
+                native: register
+            };
+  adapter.getObject(obj._id, function (err, object) {
+            if (!object) { 
+              adapter.setObject(obj._id, obj, function (err) {  });
+            } 
+  });
+}
+
 function poll () {
     adapter.log.debug("Polling")
-    client.readInputRegisters(0, 2).then(data => {
-        var value = data.buffer.readFloatBE().toFixed(1);
-        adapter.setState('voltage', {val: value, ack: true});
-    }, err =>
-        console.log(err)
-    ).then(
-        nextPoll = setTimeout(poll, 2000)
-    );
-    //nextPoll = setTimeout(poll, 20);
+    async.eachSeries(model, function(register, cb) {
+      client.readInputRegisters(register.reg, 2).then(result => {
+        adapter.log.debug("Response received");
+        var value = result.buffer.readFloatBE().toFixed(1);
+        publish(register);
+        adapter.setState(register.label, {val: value, ack: true});
+        cb();
+      }).catch(error => cb(error))
+    }, function(err) { if(err) adapter.log.error("Polling error " + err)  })
+    nextPoll = setTimeout(poll, 5000);
 }
+
