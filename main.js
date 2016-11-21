@@ -1,32 +1,3 @@
-/**
- *
- * eastron adapter
- *
- *
- *  file io-package.json comments:
- *
- *  {
- *      "common": {
- *          "name":         "eastron",                  // name has to be set and has to be equal to adapters folder name and main file name excluding extension
- *          "version":      "0.0.0",                    // use "Semantic Versioning"! see http://semver.org/
- *          "title":        "Node.js eastron Adapter",  // Adapter title shown in User Interfaces
- *          "authors":  [                               // Array of authord
- *              "name <mail@eastron.com>"
- *          ]
- *          "desc":         "eastron adapter",          // Adapter description shown in User Interfaces. Can be a language object {de:"...",ru:"..."} or a string
- *          "platform":     "Javascript/Node.js",       // possible values "javascript", "javascript/Node.js" - more coming
- *          "mode":         "daemon",                   // possible values "daemon", "schedule", "subscribe"
- *          "schedule":     "0 0 * * *"                 // cron-style schedule. Only needed if mode=schedule
- *          "loglevel":     "info"                      // Adapters Log Level
- *      },
- *      "native": {                                     // the native object is available via adapter.config in your adapters code - use it for configuration
- *          "test1": true,
- *          "test2": 42
- *      }
- *  }
- *
- */
-
 /* jshint -W097 */// jshint strict:false
 /*jslint node: true */
 "use strict";
@@ -39,42 +10,24 @@ var client = new ModbusRTU();
 var Models = require('./models.json');
 var model;
 var nextPoll;
+var connected = false;
+var failCount = 0;
 
 process.on('SIGINT', function () {
     if (adapter && adapter.setState) {
         adapter.setState("info.connection", false, true);
-        adapter.setState("info.pdu",        "",    true);
-        adapter.setState("info.poll_time",  "",    true);
     }
     if (nextPoll)  {
         clearTimeout(nextPoll);
     }
 });
 
-// is called when adapter shuts down - callback has to be called under any circumstances!
 adapter.on('unload', function (callback) {
     try {
         adapter.log.info('cleaned everything up...');
         callback();
     } catch (e) {
         callback();
-    }
-});
-
-// is called if a subscribed object changes
-adapter.on('objectChange', function (id, obj) {
-    // Warning, obj can be null if it was deleted
-    adapter.log.info('objectChange ' + id + ' ' + JSON.stringify(obj));
-});
-
-// is called if a subscribed state changes
-adapter.on('stateChange', function (id, state) {
-    // Warning, state can be null if it was deleted
-    adapter.log.info('stateChange ' + id + ' ' + JSON.stringify(state));
-
-    // you can use the ack flag to detect if it is status (true) or command (false)
-    if (state && !state.ack) {
-        adapter.log.info('ack is not set!');
     }
 });
 
@@ -86,8 +39,6 @@ adapter.on('message', function (obj) {
     }
 });
 
-// is called when databases are connected and adapter received configuration.
-// start here!
 adapter.on('ready', function () {
     if(!adapter.config.model) {
       adapter.log.error("Select a device Model");
@@ -104,69 +55,86 @@ function openResult(error) {
   if(error) {
     adapter.log.error(error);
   } else {
+    initObjects();
     adapter.log.info("Port opened, starting polling...");
     poll();
   }
 }
 
-adapter.on('unload', function () {
+function initObjects() {
+  // create connected object and state
+  adapter.getObject('info.connection', function (err, obj) {
+       if (!obj || !obj.common || obj.common.type !== 'boolean') {
+          obj = {
+              _id:  'info.connection',
+              type: 'state',
+              common: {
+                  role:  'indicator.connected',
+                  name:  'If connected to eastron device',
+                  type:  'boolean',
+                  read:  true,
+                  write: false,
+                  def:   false
+              },
+              native: {}
+          };
+          adapter.setObject('info.connection', obj, function () {
+              adapter.setState('info.connection', connected, true);
+          });
+       }
+  });
 
-});
-
-function main() {
-    adapter.log.info('config test1: ' + adapter.config.test1);
-    adapter.log.info('config test1: ' + adapter.config.test2);
-
-    adapter.setObject('testVariable', {
-        type: 'state',
-        common: {
-            name: 'testVariable',
-            type: 'boolean',
-            role: 'indicator'
-        },
-        native: {}
-    });
-    adapter.subscribeStates('*');
-    adapter.setState('testVariable', true);
-    adapter.setState('testVariable', {val: true, ack: true});
-    adapter.setState('testVariable', {val: true, ack: true, expire: 30});
+  model.forEach(function(register) {
+     adapter.getObject(register.label, function (err, object) {
+       if (!object) {
+         var obj = {
+          _id: register.label,
+          type: 'state',
+          common: {
+            name: register.label,
+            unit: register.um,
+            type: 'number',
+            role: 'variable'
+          },
+          native: register
+        };
+        adapter.setObject(obj._id, obj, function (err) {  });
+       }
+     });
+  })
 }
 
-function publish(register, value) {
-  var id = "";
-  if(register.group)
-   id = register.group + "."
-  id += register.label;
+function main() {
 
-var obj = {
-            _id: id,
-                type: 'state',
-                common: {
-                    name: id,
-                    unit: register.um,
-                    type: 'number',
-                    role: 'variable'
-                },
-                native: register
-            };
-  adapter.getObject(obj._id, function (err, object) {
-            if (!object) { 
-              adapter.setObject(obj._id, obj, function (err) {  });
-            } 
-  });
+}
+
+function setConnected(newState) {
+  if(connected != newState) {
+    if(!newState) {
+      if(++failCount > 5) {
+        connected = false;
+      }
+    } else {
+      connected = newState;
+    }
+    adapter.setState('info.connection', connected, true);
+  }
 }
 
 function poll () {
     adapter.log.debug("Polling")
     async.eachSeries(model, function(register, cb) {
       client.readInputRegisters(register.reg, 2).then(result => {
+        setConnected(true);
         adapter.log.debug("Response received");
         var value = result.buffer.readFloatBE().toFixed(1);
-        publish(register);
         adapter.setState(register.label, {val: value, ack: true});
         cb();
       }).catch(error => cb(error))
-    }, function(err) { if(err) adapter.log.error("Polling error " + err)  })
+    }, function(err) { if(err) {
+      adapter.log.warn("Polling error " + err);
+      setConnected(false); 
+    }})
     nextPoll = setTimeout(poll, 5000);
 }
 
