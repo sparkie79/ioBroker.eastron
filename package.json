@@ -12,7 +12,7 @@
       "email": "sparkie79@gmail.com"
     }
   ],
-  "homepage": "https://github.com/ioBroker/ioBroker.eastron",
+  "homepage": "https://github.com/sparkie79/ioBroker.eastron",
   "license": "MIT",
   "keywords": [
     "ioBroker",
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ioBroker/ioBroker.eastron"
+    "url": "https://github.com/sparkie79/ioBroker.eastron"
   },
   "dependencies": {
     "async": "^2.1.2",
@@ -40,7 +40,7 @@
     "grunt-exec": "^0.4.6"
   },
   "bugs": {
-    "url": "https://github.com/ioBroker/ioBroker.eastron/issues"
+    "url": "https://github.com/sparkie79/ioBroker.eastron/issues"
   },
   "readmeFilename": "README.md"
 }

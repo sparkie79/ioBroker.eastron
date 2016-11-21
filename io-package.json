@@ -4,27 +4,23 @@
         "version": "0.0.1",
 	    "news": {
 			"0.0.1": {
-			  "en": "initial adapter",
-			  "de": "Initiale Version",
-			  "ru": "Первоначальный адаптер"
+			  "en": "initial adapter"
 			}
 		},
         "title":                    "Eastron energy meter adapter",
         "desc":                     {
-				 "en": "ioBroker eastron Adapter",
-				 "de": "ioBroker Eastron Adapter",
-				 "ru": "ioBroker Eastron драйвер как образец"
+				 "en": "ioBroker eastron Adapter"
 		},
         "platform":                 "Javascript/Node.js",
         "mode":                     "daemon",
         "messagebox":		    "true",
         "icon":                     "eastron.png",
         "enabled":                  true,
-		"extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.eastron/master/admin/eastron.png",
-		"keywords":                 ["eastron", "energy", "meter"],
-        "readme":                   "https://github.com/ioBroker/ioBroker.eastron/blob/master/README.md",
-		"loglevel":                 "info",
-        "type":                     "common adapters"
+	"extIcon":                  "https://raw.githubusercontent.com/sparkie79/ioBroker.eastron/master/admin/eastron.png",
+	"keywords":                 ["eastron", "energy", "meter"],
+        "readme":                   "https://github.com/sparkie79/ioBroker.eastron/blob/master/README.md",
+	"loglevel":                 "info",
+        "type":                     "hardware"
     },
     "native": {
         "port": "/dev/ttyusb0",
@@ -32,8 +28,5 @@
         "baud": 2400,
 	"model": "SDM120CT",
         "positive": false
-    },
-    "objects": [
-
-    ]
+    }
 }
