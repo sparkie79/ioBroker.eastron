@@ -116,6 +116,7 @@ function setConnected(newState) {
       }
     } else {
       connected = newState;
+      failCount = 0;
     }
     adapter.setState('info.connection', connected, true);
   }

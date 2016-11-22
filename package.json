@@ -1,6 +1,6 @@
 {
   "name": "iobroker.eastron",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ioBroker eastron Adapter",
   "author": {
     "name": "Cosimo Corrado",
