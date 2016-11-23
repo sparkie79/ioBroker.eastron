@@ -1,14 +1,17 @@
 {
     "common": {
         "name":                     "eastron",
-        "version": "0.0.2",
+        "version": "0.0.3",
 	    "news": {
 			"0.0.1": {
 			  "en": "initial adapter"
 			},
                         "0.0.2": {
 			  "en": "bug correction on info.connection status"
-			}
+			}, 
+ 			"0.0.3": {
+  			  "en": "info.connection state now work correctly"
+                	}
 		},
         "title":                    "Eastron energy meter adapter",
         "desc":                     {

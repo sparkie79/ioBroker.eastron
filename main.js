@@ -51,6 +51,13 @@ adapter.on('ready', function () {
     client.connectRTUBuffered(adapter.config.port, {baudrate: parseInt(adapter.config.baud)}, openResult);
 });
 
+adapter.on('unload', function() {
+    if(nextPoll)
+      clearTimeout(nextPoll);
+    
+    adapter.setState("info.connection", false, true);
+});
+
 function openResult(error) {
   if(error) {
     adapter.log.error(error);
@@ -116,10 +123,12 @@ function setConnected(newState) {
       }
     } else {
       connected = newState;
-      failCount = 0;
     }
     adapter.setState('info.connection', connected, true);
   }
+
+  if(connected)
+   failCount = 0;
 }
 
 function poll () {
